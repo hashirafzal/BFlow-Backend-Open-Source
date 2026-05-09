@@ -46,4 +46,9 @@ public interface RepositoryAuthAccount
             AuthProvider provider,
             String providerUserId
     );
+
+    Optional<AuthAccount> findByProviderAndProviderUserId(
+            AuthProvider provider,
+            String providerUserId
+    );
 }

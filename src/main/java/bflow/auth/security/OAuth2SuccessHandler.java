@@ -3,6 +3,7 @@ package bflow.auth.security;
 import bflow.auth.entities.User;
 import bflow.auth.enums.AuthProvider;
 import bflow.auth.security.jwt.JwtService;
+import bflow.auth.services.ServiceRefreshToken;
 import bflow.auth.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,6 +30,8 @@ public final class OAuth2SuccessHandler
     /** Service for User persistence logic. */
     private final UserService userService;
 
+    private final ServiceRefreshToken serviceRefreshToken;
+
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
@@ -42,6 +45,14 @@ public final class OAuth2SuccessHandler
 
         String email = oAuth2User.getAttribute("email");
         String providerId = oAuth2User.getAttribute("sub");
+        Boolean emailVerified =
+                oAuth2User.getAttribute("email_verified");
+
+        if (Boolean.FALSE.equals(emailVerified)) {
+            throw new IllegalStateException(
+                    "OAuth2 email not verified"
+            );
+        }
 
         if (email == null || providerId == null) {
             throw new IllegalStateException(
@@ -55,10 +66,7 @@ public final class OAuth2SuccessHandler
                 AuthProvider.GOOGLE
         );
 
-        List<String> roles = user.getRoles()
-                .stream()
-                .map(r -> "ROLE_" + r)
-                .toList();
+        List<String> roles = List.copyOf(user.getRoles());
 
         String accessToken = jwtService.generateToken(
                 user.getId(),
@@ -67,6 +75,8 @@ public final class OAuth2SuccessHandler
         );
 
         String refreshToken = UUID.randomUUID().toString();
+
+        serviceRefreshToken.create(user.getId(), refreshToken);
 
         jwtService.attachAuthCookies(response, accessToken, refreshToken);
         response.sendRedirect(frontendUrl);

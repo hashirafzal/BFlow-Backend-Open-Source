@@ -29,6 +29,8 @@ public class UserServiceImpl implements UserService {
     /** Repository for authentication account mapping. */
     private final RepositoryAuthAccount authAccountRepository;
 
+    private final ServiceRefreshToken serviceRefreshToken;
+
     /**
      * Resolves an OAuth2 user by email, provider ID, and provider type.
      * Handles user validation and creation for OAuth2 authentication.
@@ -43,29 +45,39 @@ public class UserServiceImpl implements UserService {
             final String providerId,
             final AuthProvider provider
     ) {
-        return userRepository.findByEmail(email)
-                .map(existingUser -> validateProvider(existingUser, provider))
-                .orElseGet(() -> createOAuth2User(email, providerId, provider));
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> createUser(email));
+
+        boolean alreadyLinked = authAccountRepository
+                .existsByProviderAndProviderUserId(
+                        provider,
+                        providerId
+                );
+
+        if (!alreadyLinked) {
+
+            AuthAccount account = AuthAccount.builder()
+                    .user(user)
+                    .provider(provider)
+                    .providerUserId(providerId)
+                    .enabled(true)
+                    .build();
+
+            authAccountRepository.save(account);
+        }
+
+        return user;
     }
 
-    /**
-     * Ensures the user is using the same provider they registered with.
-     * @param user current user.
-     * @param provider attempted provider.
-     * @return the validated user.
-     */
-    private User validateProvider(
-            final User user,
-            final AuthProvider provider
-    ) {
+    private User createUser(final String email) {
 
-        if (user.getProvider() != provider) {
-            throw new IllegalStateException(
-                    "User already registered with provider: "
-                            + user.getProvider()
-            );
-        }
-        return user;
+        User user = User.builder()
+                .email(email)
+                .roles(Set.of("ROLE_USER"))
+                .status(UserStatus.ACTIVE)
+                .build();
+
+        return userRepository.save(user);
     }
 
     private User createOAuth2User(
@@ -76,7 +88,6 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .email(email)
                 .status(UserStatus.ACTIVE)
-                .provider(provider)
                 .roles(Set.of("ROLE_USER"))
                 .build();
 
@@ -110,7 +121,6 @@ public class UserServiceImpl implements UserService {
                 .orElseGet(() -> userRepository.save(
                         User.builder()
                                 .email(email)
-                                .provider(provider)
                                 .roles(Set.of("ROLE_USER"))
                                 .status(UserStatus.ACTIVE)
                                 .build()
@@ -168,6 +178,7 @@ public class UserServiceImpl implements UserService {
         User user = findById(userId);
 
         user.setStatus(UserStatus.DELETED);
+        serviceRefreshToken.revokeAll(userId);
 
         userRepository.save(user);
     }

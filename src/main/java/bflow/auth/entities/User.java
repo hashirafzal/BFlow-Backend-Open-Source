@@ -46,11 +46,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    /** The authentication provider used by the user. */
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AuthProvider provider;
-
     /** The set of roles assigned to the user. */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -60,6 +55,9 @@ public class User {
     @Column(name = "role")
     @Builder.Default
     private Set<String> roles = Set.of("ROLE_USER");
+
+    @Column(nullable = false)
+    private boolean emailVerified;
 
     /** Indicates whether the user account is active. */
     @Enumerated(EnumType.STRING)

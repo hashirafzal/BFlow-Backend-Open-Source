@@ -81,12 +81,13 @@ public class AuthController {
         setCookie(response,
                 "access_token",
                 accessToken,
-                jwtService.getAccessTokenTtlSeconds());
+                jwtService.getAccessTokenTtlSeconds(), "/");
 
         setCookie(response,
                 "refresh_token",
                 rawRefreshToken,
-                MAX_COOKIE_DAYS * SECONDS_IN_A_DAY);
+                MAX_COOKIE_DAYS * SECONDS_IN_A_DAY,
+                "/");
 
         return ResponseEntity.ok().build();
     }
@@ -107,8 +108,8 @@ public class AuthController {
             serviceRefreshToken.validateAndRotate(refreshToken);
         }
 
-        clearCookie(response, "access_token");
-        clearCookie(response, "refresh_token");
+        clearCookie(response, "access_token", "/");
+        clearCookie(response, "refresh_token", "/");
 
         return ResponseEntity.ok().build();
     }
@@ -142,12 +143,13 @@ public class AuthController {
         setCookie(response,
                 "access_token",
                 accessToken,
-                jwtService.getAccessTokenTtlSeconds());
+                jwtService.getAccessTokenTtlSeconds(), "/");
 
         setCookie(response,
                 "refresh_token",
                 rawRefreshToken,
-                cookieMaxAge);
+                cookieMaxAge,
+                "/");
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -215,11 +217,12 @@ public class AuthController {
         setCookie(response,
                 "access_token",
                 newAccessToken,
-                jwtService.getAccessTokenTtlSeconds());
+                jwtService.getAccessTokenTtlSeconds(), "/");
         setCookie(response,
                 "refresh_token",
                 result.newRefreshToken(),
-                MAX_COOKIE_DAYS * SECONDS_IN_A_DAY);
+                MAX_COOKIE_DAYS * SECONDS_IN_A_DAY,
+                "/");
 
         return ResponseEntity.ok().build();
     }
@@ -250,12 +253,17 @@ public class AuthController {
      * @param value cookie value.
      * @param maxAge cookie expiry.
      */
-    private void setCookie(final HttpServletResponse res, final String name,
-                           final String value, final long maxAge) {
+    private void setCookie(
+            final HttpServletResponse res,
+            final String name,
+            final String value,
+            final long maxAge,
+            final String path
+    ) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .secure(true)
-                .path("/")
+                .path(path)
                 .sameSite("None")
                 .maxAge(maxAge)
                 .build();
@@ -267,12 +275,16 @@ public class AuthController {
      * @param res servlet response.
      * @param name cookie name.
      */
-    private void clearCookie(final HttpServletResponse res, final String name) {
+    private void clearCookie(
+            final HttpServletResponse res,
+            final String name,
+            final String path
+    ) {
         ResponseCookie cookie = ResponseCookie.from(name, "")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
-                .path("/")
+                .path(path)
                 .maxAge(0)
                 .build();
 

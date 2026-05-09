@@ -1,5 +1,7 @@
 package bflow.auth.security.jwt;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -9,7 +11,11 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
  * Configuration for JWT decoding using JWKS.
  */
 @Configuration
+@RequiredArgsConstructor
 public class JwtConfig {
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     /**
      * Configures the JwtDecoder bean.
@@ -18,7 +24,9 @@ public class JwtConfig {
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder
-                .withJwkSetUri("http://localhost:8080/.well-known/jwks.json")
+                .withJwkSetUri(
+                        baseUrl + "/.well-known/jwks.json"
+                )
                 .build();
     }
 }
