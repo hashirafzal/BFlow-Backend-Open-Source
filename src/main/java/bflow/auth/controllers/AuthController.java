@@ -264,8 +264,8 @@ public class AuthController {
             final String path
     ) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
-                .httpOnly(true)
-                .secure(true)
+                .httpOnly(false)
+                .secure(false)
                 .path(path)
                 .sameSite("None")
                 .maxAge(maxAge)
@@ -285,8 +285,8 @@ public class AuthController {
             final String path
     ) {
         ResponseCookie cookie = ResponseCookie.from(name, "")
-                .httpOnly(true)
-                .secure(true)
+                .httpOnly(false)
+                .secure(false)
                 .sameSite("None")
                 .path(path)
                 .maxAge(0)

@@ -34,8 +34,8 @@ public final class OAuth2SuccessHandler
     private final ServiceRefreshToken serviceRefreshToken;
 
     /** The frontend URL for redirecting on successful authentication. */
-    @Value("${app.frontend-url}")
-    private String frontendUrl;
+    //@Value("${app.frontend-url}")
+    private final String frontendUrl = "http://localhost:5173/app/dashboard";
 
     @Override
     public void onAuthenticationSuccess(
