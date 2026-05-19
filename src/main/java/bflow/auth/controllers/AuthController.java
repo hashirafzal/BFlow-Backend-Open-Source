@@ -11,6 +11,7 @@ import bflow.auth.entities.RefreshToken;
 import bflow.auth.entities.User;
 import bflow.auth.security.jwt.JwtService;
 import bflow.auth.services.AuthService;
+import bflow.auth.services.EmailVerificationService;
 import bflow.auth.services.PasswordResetService;
 import bflow.auth.services.ServiceRefreshToken;
 import bflow.common.response.ApiResponse;
@@ -24,12 +25,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -51,6 +48,8 @@ public class AuthController {
 
     /** Service for password reset operations. */
     private final PasswordResetService passwordResetService;
+
+    private final EmailVerificationService emailVerificationService;
 
     /** Total seconds in one day. */
     private static final int SECONDS_IN_A_DAY = 86400;
@@ -136,6 +135,7 @@ public class AuthController {
     ) {
 
         User user = authService.register(request);
+        emailVerificationService.sendVerificationEmail(user);
 
         List<String> roles = authService.getRoles(user);
 
@@ -290,6 +290,39 @@ public class AuthController {
                 Map.of(
                         "message",
                         "Password updated successfully"
+                )
+        );
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(
+            @RequestParam final String token
+    ) {
+
+        emailVerificationService.verifyEmail(token);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message",
+                        "Email verified successfully"
+                )
+        );
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<?> resendVerification(
+            final Authentication authentication
+    ) {
+
+        UUID userId =
+                UUID.fromString(authentication.getName());
+
+        emailVerificationService.resendVerification(userId);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message",
+                        "Verification email sent"
                 )
         );
     }
