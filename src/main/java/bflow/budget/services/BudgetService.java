@@ -10,6 +10,7 @@ import bflow.budget.RepositoryBudget;
 import bflow.budget.entity.Budget;
 import bflow.budget.enums.BudgetScope;
 import bflow.budget.enums.BudgetStatus;
+import bflow.budget.enums.PeriodType;
 import bflow.common.exception.BudgetNotFoundException;
 import bflow.common.exception.WalletAccessDeniedException;
 import bflow.notifications.service.NotificationService;
@@ -57,6 +58,7 @@ public class BudgetService {
 
     private final BudgetValidationService validationService;
     private final BudgetLifecycleService lifecycleService;
+    private final BudgetOverlapValidationService overlapValidationService;
 
     /**
      * Get the status of a specific budget.
@@ -94,6 +96,7 @@ public class BudgetService {
         userService.validateUserActive(userId);
 
         //Check the start date for the budget before handle a query
+        validationService.validateAmount(request.getAmount());
         validationService.validateStartDate(request.getStartDate());
 
         Budget budget = new Budget();
@@ -115,6 +118,11 @@ public class BudgetService {
                 request.getCategoryId(),
                 request.getThresholdWarning(),
                 request.getThresholdCritical()
+        );
+
+        overlapValidationService.validateCreateOverlap(
+                request,
+                userId
         );
 
         budget.setWallet(wallet);
@@ -317,6 +325,19 @@ public class BudgetService {
                 finalCritical
         );
 
+        PeriodType finalPeriod =
+                request.getPeriod() != null
+                        ? request.getPeriod()
+                        : budget.getPeriod();
+
+        overlapValidationService.validatePatchOverlap(
+                budget,
+                finalScope,
+                finalCategoryId,
+                finalPeriod,
+                userId
+        );
+
         boolean shouldResetAlerts =
                 request.getAmount() != null
                         || request.getPeriod() != null
@@ -325,12 +346,11 @@ public class BudgetService {
                         || request.getCategoryId() != null;
 
         if (request.getAmount() != null) {
+            validationService.validateAmount(request.getAmount());
             budget.setAmount(request.getAmount());
         }
 
-        if (request.getPeriod() != null) {
-            budget.setPeriod(request.getPeriod());
-        }
+        budget.setPeriod(finalPeriod);
 
         if (request.getStartDate() != null) {
             budget.setStartDate(request.getStartDate());

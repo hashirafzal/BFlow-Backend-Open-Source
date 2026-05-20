@@ -6,6 +6,7 @@ import bflow.common.exception.InvalidBudgetScopeException;
 import bflow.common.exception.InvalidBudgetThresholdException;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -49,6 +50,21 @@ public class BudgetValidationService {
 
             throw new InvalidBudgetThresholdException(
                     "Warning threshold must be lower than critical threshold"
+            );
+        }
+    }
+
+    public void validateAmount(final BigDecimal amount) {
+
+        if (amount == null) {
+            throw new IllegalArgumentException(
+                    "Budget amount is required"
+            );
+        }
+
+        if (amount.compareTo(BigDecimal.ONE) < 0) {
+            throw new IllegalArgumentException(
+                    "Budget amount must be greater than or equal to 1"
             );
         }
     }
