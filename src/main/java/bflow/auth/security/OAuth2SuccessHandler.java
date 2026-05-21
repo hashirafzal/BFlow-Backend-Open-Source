@@ -64,7 +64,8 @@ public final class OAuth2SuccessHandler
         User user = userService.resolveOAuth2User(
                 email,
                 providerId,
-                AuthProvider.GOOGLE
+                AuthProvider.GOOGLE,
+                Boolean.TRUE.equals(emailVerified)
         );
 
         List<String> roles = List.copyOf(user.getRoles());

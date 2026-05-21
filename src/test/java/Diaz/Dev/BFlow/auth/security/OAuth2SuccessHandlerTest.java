@@ -129,11 +129,15 @@ class OAuth2SuccessHandlerTest {
         u.setEmail("a@b.com");
         u.setRoles(Set.of("ROLE_USER"));
 
+        Boolean emailVerified =
+                (Boolean) user.getAttributes().get("email_verified");
+
         when(
                 userService.resolveOAuth2User(
                         "a@b.com",
                         "prov-1",
-                        AuthProvider.GOOGLE
+                        AuthProvider.GOOGLE,
+                        Boolean.TRUE.equals(emailVerified)
                 )
         ).thenReturn(u);
 

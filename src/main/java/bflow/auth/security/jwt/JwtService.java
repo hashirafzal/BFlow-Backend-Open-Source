@@ -66,4 +66,11 @@ public interface JwtService {
             String accessToken,
             String refreshToken
     );
+
+    /**
+     * Clear authentication cookies from the response.
+     *
+     * @param response servlet response.
+     */
+    void clearAuthCookies(HttpServletResponse response);
 }

@@ -137,4 +137,29 @@ public final class JwtServiceImpl implements JwtService {
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
+
+    @Override
+    public void clearAuthCookies(final HttpServletResponse response) {
+
+        ResponseCookie accessCookie =
+                ResponseCookie.from("access_token", "")
+                        .httpOnly(true)
+                        .secure(true)
+                        .path("/")
+                        .sameSite("None")
+                        .maxAge(0)
+                        .build();
+
+        ResponseCookie refreshCookie =
+                ResponseCookie.from("refresh_token", "")
+                        .httpOnly(true)
+                        .secure(true)
+                        .path("/")
+                        .sameSite("None")
+                        .maxAge(0)
+                        .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
 }
