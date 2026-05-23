@@ -49,10 +49,9 @@ class OAuth2SuccessHandlerTest {
         handler = new OAuth2SuccessHandler(
                 jwtService,
                 userService,
-                serviceRefreshToken
+                serviceRefreshToken,
+                "http://localhost:3000"
         );
-
-        ReflectionTestUtils.setField(handler, "frontendUrl", "http://localhost:3000");
     }
 
     @Test
@@ -135,7 +134,7 @@ class OAuth2SuccessHandlerTest {
         when(
                 userService.resolveOAuth2User(
                         "a@b.com",
-                        "prov-1",
+                        "a@b.com",
                         AuthProvider.GOOGLE,
                         Boolean.TRUE.equals(emailVerified)
                 )

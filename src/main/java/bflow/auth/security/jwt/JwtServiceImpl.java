@@ -56,6 +56,7 @@ public final class JwtServiceImpl implements JwtService {
                             Instant.now().plusSeconds(ACCESS_TOKEN_TTL_SECONDS)
                     ))
                     .issuer("bflow-api")
+                    .audience(AUDIENCE)
                     .build();
 
             JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
