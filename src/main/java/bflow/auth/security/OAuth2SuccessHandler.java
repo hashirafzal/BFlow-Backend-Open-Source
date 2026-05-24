@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
  * Strategy used to handle successful OAuth2 authentication.
  */
 @Component
-@RequiredArgsConstructor
 public final class OAuth2SuccessHandler
         implements AuthenticationSuccessHandler {
 
@@ -34,8 +33,19 @@ public final class OAuth2SuccessHandler
     private final ServiceRefreshToken serviceRefreshToken;
 
     /** The frontend URL for redirecting on successful authentication. */
-    @Value("${app.frontend-url}")
     private final String frontendUrl;
+
+    public OAuth2SuccessHandler(
+            JwtService jwtService,
+            UserService userService,
+            ServiceRefreshToken serviceRefreshToken,
+            @Value("${app.frontend-url}") String frontendUrl
+    ) {
+        this.jwtService = jwtService;
+        this.userService = userService;
+        this.serviceRefreshToken = serviceRefreshToken;
+        this.frontendUrl = frontendUrl;
+    }
 
     @Override
     public void onAuthenticationSuccess(
