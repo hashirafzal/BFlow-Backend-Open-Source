@@ -1,6 +1,7 @@
 package bflow.common.aws.service;
 
 
+import bflow.common.exception.EmailDeliveryException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import software.amazon.awssdk.services.ses.model.Content;
 import software.amazon.awssdk.services.ses.model.Destination;
 import software.amazon.awssdk.services.ses.model.Message;
 import software.amazon.awssdk.services.ses.model.SendEmailRequest;
+import software.amazon.awssdk.services.ses.model.SesException;
 
 /**
  * Service for sending emails using AWS SES.
@@ -40,27 +42,34 @@ public final class SesEmailService {
             final String subject,
             final String html
     ) {
-        SendEmailRequest request = SendEmailRequest.builder()
-                .source(from)
-                .destination(Destination.builder()
-                        .toAddresses(to)
-                        .build())
-                .message(Message.builder()
-                        .subject(Content.builder()
-                                .data(subject)
-                                .charset("UTF-8")
-                                .build())
-                        .body(Body.builder()
-                                .html(
-                                        Content.builder()
-                                                .data(html)
-                                                .charset("UTF-8")
-                                                .build()
-                                )
-                                .build())
-                        .build())
-                .build();
+        try {
+            SendEmailRequest request = SendEmailRequest.builder()
+                    .source(from)
+                    .destination(Destination.builder()
+                            .toAddresses(to)
+                            .build())
+                    .message(Message.builder()
+                            .subject(Content.builder()
+                                    .data(subject)
+                                    .charset("UTF-8")
+                                    .build())
+                            .body(Body.builder()
+                                    .html(
+                                            Content.builder()
+                                                    .data(html)
+                                                    .charset("UTF-8")
+                                                    .build()
+                                    )
+                                    .build())
+                            .build())
+                    .build();
 
-        sesClient.sendEmail(request);
+            sesClient.sendEmail(request);
+        } catch (SesException ex) {
+            throw new EmailDeliveryException(
+                    "Email service unavailable",
+                    ex
+            );
+        }
     }
 }

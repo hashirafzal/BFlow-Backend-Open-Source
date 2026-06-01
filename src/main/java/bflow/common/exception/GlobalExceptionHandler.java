@@ -304,6 +304,22 @@ public final class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(EmailDeliveryException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEmailDeliveryException(
+            final EmailDeliveryException ex,
+            final HttpServletRequest request
+    ) {
+
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(
+                        ApiResponse.error(
+                                ex.getMessage(),
+                                request.getRequestURI()
+                        )
+                );
+    }
+
     /**
      * Determines whether the exception is a harmless
      * network/client disconnect exception.

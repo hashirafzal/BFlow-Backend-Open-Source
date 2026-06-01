@@ -8,6 +8,9 @@ import bflow.auth.enums.AuthProvider;
 import bflow.auth.enums.UserStatus;
 import bflow.auth.repository.RepositoryAuthAccount;
 import bflow.auth.repository.RepositoryUser;
+import bflow.subscription.repository.RepositoryPlan;
+import bflow.subscription.repository.RepositorySubscription;
+import bflow.subscription.services.SubscriptionService;
 import jakarta.transaction.Transactional;
 
 import java.util.Optional;
@@ -36,6 +39,11 @@ public class UserServiceImpl implements UserService {
 
     /** Service for refresh token operations. */
     private final ServiceRefreshToken serviceRefreshToken;
+
+    private final RepositorySubscription subscriptionRepository;
+    private final RepositoryPlan repositoryPlan;
+
+    private final SubscriptionService subscriptionService;
 
     /**
      * Resolves an OAuth2 user by email, provider ID, and provider type.
@@ -113,7 +121,10 @@ public class UserServiceImpl implements UserService {
                 .status(UserStatus.ACTIVE)
                 .build();
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        subscriptionService.createFreeSubscription(savedUser);
+
+        return savedUser;
     }
 
     /**
