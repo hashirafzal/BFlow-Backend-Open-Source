@@ -8,6 +8,7 @@ import bflow.auth.enums.UserStatus;
 import bflow.auth.repository.RepositoryAuthAccount;
 import bflow.auth.repository.RepositoryUser;
 import bflow.common.exception.InvalidCredentialsException;
+import bflow.subscription.services.SubscriptionService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
@@ -15,12 +16,14 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service providing core authentication and registration business logic.
  */
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
 
     /** Repository for authentication account data. */
@@ -29,6 +32,9 @@ public class AuthService {
     private final RepositoryUser userRepository;
     /** Encoder for hashing and verifying passwords. */
     private final PasswordEncoder passwordEncoder;
+
+    /** Service for managing subscriptions during user registration. */
+    private final SubscriptionService subscriptionService;
 
     /**
      * Authenticates a user based on email and password.
@@ -88,6 +94,7 @@ public class AuthService {
         user.setStatus(UserStatus.ACTIVE);
 
         userRepository.save(user);
+        subscriptionService.createFreeSubscription(user);
 
         AuthAccount account = new AuthAccount();
         account.setUser(user);

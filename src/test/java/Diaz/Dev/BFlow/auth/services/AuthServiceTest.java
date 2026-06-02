@@ -9,6 +9,7 @@ import bflow.auth.repository.RepositoryAuthAccount;
 import bflow.auth.repository.RepositoryUser;
 import bflow.auth.services.AuthService;
 import bflow.common.exception.InvalidCredentialsException;
+import bflow.subscription.services.SubscriptionService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,6 +35,9 @@ class AuthServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private SubscriptionService subscriptionService;
 
     @InjectMocks
     private AuthService authService;
@@ -91,6 +95,31 @@ class AuthServiceTest {
     }
 
     @Test
+    void getRoles_ok() {
+        User user = User.builder()
+                .roles(Set.of("ROLE_USER", "ROLE_ADMIN"))
+                .build();
+
+        assertEquals(
+                Set.of("ROLE_USER", "ROLE_ADMIN"),
+                Set.copyOf(authService.getRoles(user))
+        );
+    }
+
+    @Test
+    void findById_ok() {
+        UUID id = UUID.randomUUID();
+        User user = User.builder()
+                .id(id)
+                .email("found@test.com")
+                .build();
+
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+
+        assertEquals(user, authService.findById(id));
+    }
+
+    @Test
     void register_ok() {
         AuthRegisterRequest dto = new AuthRegisterRequest();
         dto.setEmail("new@test.com");
@@ -106,6 +135,7 @@ class AuthServiceTest {
         authService.register(dto);
 
         verify(userRepository).save(any(User.class));
+        verify(subscriptionService).createFreeSubscription(any(User.class));
         verify(authAccountRepository).save(any(AuthAccount.class));
     }
 }

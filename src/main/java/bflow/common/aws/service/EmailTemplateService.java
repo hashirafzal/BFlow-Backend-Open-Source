@@ -92,7 +92,7 @@ public final class EmailTemplateService {
 
         String verificationUrl =
                 frontendUrl
-                        + "/verify-email?token="
+                        + "/api/auth/verify-email?token="
                         + token;
 
         Context context = new Context();
