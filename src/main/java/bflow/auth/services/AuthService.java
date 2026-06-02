@@ -33,6 +33,7 @@ public class AuthService {
     /** Encoder for hashing and verifying passwords. */
     private final PasswordEncoder passwordEncoder;
 
+    /** Service for managing subscriptions during user registration. */
     private final SubscriptionService subscriptionService;
 
     /**

@@ -6,11 +6,10 @@ import bflow.subscription.entities.Plan;
 import bflow.subscription.entities.Subscription;
 import bflow.subscription.enums.BillingPeriod;
 import bflow.subscription.enums.SubscriptionStatus;
-import bflow.subscription.repository.RepositoryPlan;
 import bflow.subscription.repository.RepositorySubscription;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -21,16 +20,36 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class SubscriptionService {
 
+    /** Days in a year used for subscription calculations. */
+    private static final int DAYS_PER_YEAR = 365;
+
+    /** Days in a month used for subscription calculations. */
+    private static final int DAYS_PER_MONTH = 30;
+
+    /** Repository used for subscription persistence and lookup. */
     private final RepositorySubscription subscriptionRepository;
 
+    /** Service responsible for plan lookup and plan-related operations. */
     private final PlanService planService;
 
-    public Plan getCurrentPlan(UUID userId) {
+    /**
+     * Get the current plan for a user.
+     *
+     * @param userId the user identifier
+     * @return the user's active plan
+     */
+    public Plan getCurrentPlan(final UUID userId) {
         return getActiveSubscription(userId)
                 .getPlan();
     }
 
-    public Subscription getActiveSubscription(UUID userId) {
+    /**
+     * Find the active subscription for a user.
+     *
+     * @param userId the user identifier
+     * @return the active Subscription
+     */
+    public Subscription getActiveSubscription(final UUID userId) {
         return subscriptionRepository
                 .findByUserIdAndStatus(
                         userId,
@@ -42,6 +61,12 @@ public class SubscriptionService {
                         ));
     }
 
+    /**
+     * Create a free subscription for a newly registered user.
+     *
+     * @param user the user entity
+     * @return the created or existing free subscription
+     */
     public Subscription createFreeSubscription(final User user) {
 
         if (subscriptionRepository.existsByUserId(user.getId())) {
@@ -64,11 +89,13 @@ public class SubscriptionService {
         subscription.setStartsAt(now);
 
         if (freePlan.getBillingPeriod() == BillingPeriod.YEARLY) {
-            subscription.setEndsAt(now.plus(365, ChronoUnit.DAYS));
-            subscription.setNextBillingAt(now.plus(365, ChronoUnit.DAYS));
+            Instant ends = now.plus(DAYS_PER_YEAR, ChronoUnit.DAYS);
+            subscription.setEndsAt(ends);
+            subscription.setNextBillingAt(ends);
         } else {
-            subscription.setEndsAt(now.plus(30, ChronoUnit.DAYS));
-            subscription.setNextBillingAt(now.plus(30, ChronoUnit.DAYS));
+            Instant ends = now.plus(DAYS_PER_MONTH, ChronoUnit.DAYS);
+            subscription.setEndsAt(ends);
+            subscription.setNextBillingAt(ends);
         }
 
         subscription.setAutoRenew(false);

@@ -4,7 +4,7 @@
 
 ## Overview
 
-This Cookie Policy explains how BFlow Studio ("we," "us," "our," or "Company") uses cookies on our personal finance tracking application, accessible at https://bflow-studio.com ("Application"). Our use of cookies is minimal and focused exclusively on essential security and authentication functions.
+This Cookie Policy explains how BFlow Studio ("we," "us," "our") uses cookies on our personal finance tracking application, accessible at https://bflow-studio.com ("Application"). Our use of cookies is minimal and focused exclusively on essential security and authentication functions.
 
 **Key takeaway:** We use only strictly necessary cookies for authentication and session management. We do not use cookies for analytics, advertising, behavioral tracking, or profiling.
 

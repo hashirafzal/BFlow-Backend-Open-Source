@@ -11,5 +11,11 @@ import java.util.UUID;
 public interface RepositoryPlan
         extends JpaRepository<Plan, UUID> {
 
+    /**
+     * Find a plan by its unique code.
+     *
+     * @param code the plan code
+     * @return optional plan matching the code
+     */
     Optional<Plan> findByCode(String code);
 }

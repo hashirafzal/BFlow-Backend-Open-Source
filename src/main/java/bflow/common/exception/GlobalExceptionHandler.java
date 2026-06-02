@@ -304,6 +304,14 @@ public final class GlobalExceptionHandler {
                 ));
     }
 
+        /**
+         * Handle errors related to email delivery and return a service
+         * unavailable response.
+         *
+         * @param ex the email delivery exception
+         * @param request the HTTP request
+         * @return a service unavailable response entity
+         */
     @ExceptionHandler(EmailDeliveryException.class)
     public ResponseEntity<ApiResponse<Void>> handleEmailDeliveryException(
             final EmailDeliveryException ex,

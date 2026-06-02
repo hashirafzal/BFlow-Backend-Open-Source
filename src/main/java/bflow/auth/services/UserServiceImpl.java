@@ -40,9 +40,13 @@ public class UserServiceImpl implements UserService {
     /** Service for refresh token operations. */
     private final ServiceRefreshToken serviceRefreshToken;
 
+    /** Repository for subscription lookup and persistence. */
     private final RepositorySubscription subscriptionRepository;
+
+    /** Repository for plan lookup and persistence. */
     private final RepositoryPlan repositoryPlan;
 
+    /** Service responsible for subscription lifecycle operations. */
     private final SubscriptionService subscriptionService;
 
     /**

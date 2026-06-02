@@ -1,12 +1,12 @@
 # TERMS AND CONDITIONS
 
-**Last updated April 11, 2026**
+**Last updated June 2, 2026**
 
 ---
 
 ## AGREEMENT TO OUR LEGAL TERMS
 
-We are **BFlow Studio**, doing business as **BFlow** ("Company," "we," "us," "our"), a company registered in El Salvador.
+We are **BFlow Studio**, doing business as **BFlow** ("we," "us," "our").
 
 We operate the website [https://bflow-studio.com](https://bflow-studio.com) (the "Site"), as well as any other related products and services that refer or link to these legal terms (the "Legal Terms") (collectively, the "Services").
 

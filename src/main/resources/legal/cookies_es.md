@@ -4,7 +4,7 @@
 
 ## Descripción general
 
-Esta Política de Cookies explica cómo BFlow Studio ("nosotros," "nos," "nuestro," o "Empresa") utiliza cookies en nuestra aplicación de gestión de finanzas personales, accesible en https://bflow-studio.com ("Aplicación"). Nuestro uso de cookies es mínimo y se enfoca exclusivamente en funciones de seguridad y autenticación esencial.
+Esta Política de Cookies explica cómo BFlow Studio ("nosotros," "nos," "nuestro") utiliza cookies en nuestra aplicación de gestión de finanzas personales, accesible en https://bflow-studio.com ("Aplicación"). Nuestro uso de cookies es mínimo y se enfoca exclusivamente en funciones de seguridad y autenticación esencial.
 
 **Lo más importante:** Utilizamos solo cookies estrictamente necesarias para autenticación y gestión de sesiones. No utilizamos cookies para análisis, publicidad, seguimiento de comportamiento o creación de perfiles.
 
